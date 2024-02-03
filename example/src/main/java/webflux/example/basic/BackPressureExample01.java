@@ -1,4 +1,4 @@
-package webflux.example;
+package webflux.example.basic;
 
 import org.reactivestreams.Subscription;
 import org.slf4j.Logger;

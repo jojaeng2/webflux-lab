@@ -9,9 +9,7 @@ import reactor.core.publisher.Mono;
 public class ExampleApplication {
 
 	public static void main(String[] args) {
-		Mono.just("Hello Reactor")
-			.subscribe(message -> System.out.println("message = " + message));
-//		SpringApplication.run(ExampleApplication.class, args);
+		SpringApplication.run(ExampleApplication.class, args);
 	}
 
 }

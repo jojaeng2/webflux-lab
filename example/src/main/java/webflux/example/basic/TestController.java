@@ -1,4 +1,4 @@
-package webflux.example;
+package webflux.example.basic;
 
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatusCode;

@@ -1,4 +1,4 @@
-package webflux.example;
+package webflux.example.basic;
 
 import lombok.extern.slf4j.Slf4j;
 

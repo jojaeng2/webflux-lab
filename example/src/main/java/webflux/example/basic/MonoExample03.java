@@ -1,4 +1,4 @@
-package webflux.example;
+package webflux.example.basic;
 
 public class MonoExample03 {
 }
