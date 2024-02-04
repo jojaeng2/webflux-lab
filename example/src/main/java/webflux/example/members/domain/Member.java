@@ -12,6 +12,7 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import webflux.example.members.dto.MemberDTO;
 
 @Table(name = "MBR")
 @Entity
@@ -31,4 +32,11 @@ public class Member {
 
     @Column(name = "MBR_AGE")
     private Integer age;
+
+    public static Member create(MemberDTO dto) {
+        return Member.builder()
+            .name(dto.getName())
+            .age(dto.getAge())
+            .build();
+    }
 }
