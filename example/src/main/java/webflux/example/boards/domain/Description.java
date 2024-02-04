@@ -12,8 +12,10 @@ import lombok.NoArgsConstructor;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
 import jakarta.persistence.Table;
 import webflux.example.boards.dto.DescriptionDTO;
+import webflux.example.members.domain.Member;
 
 @Table(name = "DCP")
 @Entity
@@ -38,10 +40,14 @@ public class Description {
     @Column(name = "DCP_REG_DATE")
     private Date register = new Date();
 
+    @Column(name = "MBR_ID")
+    private String memberId;
+
     public static Description create(DescriptionDTO dto) {
         return Description.builder()
             .title(dto.getTitle())
             .script(dto.getScript())
+            .memberId(dto.getMemberId())
             .build();
     }
 }

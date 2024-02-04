@@ -1,5 +1,7 @@
 package webflux.example.boards.application.service;
 
+import java.util.List;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,6 +30,9 @@ public class DescriptionService {
             .orElse(null);
     }
 
-//    @Transactional(readOnly = true)
+    @Transactional(readOnly = true)
+    public List<Description> findByMemberId(String memberId) {
+        return descriptionRepository.findByMemberId(memberId);
+    }
 
 }

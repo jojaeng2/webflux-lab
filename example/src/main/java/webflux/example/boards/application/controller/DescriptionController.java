@@ -1,5 +1,7 @@
 package webflux.example.boards.application.controller;
 
+import java.util.List;
+
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -38,5 +40,19 @@ public class DescriptionController {
             .script(description.getScript())
             .register(description.getRegister())
             .build();
+    }
+
+    @GetMapping("/descriptions/member/{id}")
+    public List<DescriptionResponse> getByMemberId(@PathVariable String id) {
+        return descriptionService.findByMemberId(id)
+            .stream()
+            .map(description -> DescriptionResponse.builder()
+                    .id(description.getId())
+                    .title(description.getTitle())
+                    .script(description.getScript())
+                    .register(description.getRegister())
+                    .build()
+            )
+            .toList();
     }
 }
