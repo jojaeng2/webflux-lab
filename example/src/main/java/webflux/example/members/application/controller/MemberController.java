@@ -32,6 +32,11 @@ public class MemberController {
 
     @GetMapping("/user/{id}")
     public MemberResponse getById(@PathVariable String id) {
-        
+        Member member = memberService.findById(id);
+        return MemberResponse.builder()
+            .id(member.getId())
+            .name(member.getName())
+            .age(member.getAge())
+            .build();
     }
 }

@@ -21,4 +21,10 @@ public class MemberService {
         Member member = Member.create(dto);
         return memberRepository.save(member);
     }
+
+    @Transactional(readOnly = true)
+    public Member findById(String id) {
+        return memberRepository.findById(id)
+            .orElse(null);
+    }
 }
