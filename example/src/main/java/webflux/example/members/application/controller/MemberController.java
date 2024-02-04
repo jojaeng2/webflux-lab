@@ -1,5 +1,7 @@
 package webflux.example.members.application.controller;
 
+import java.util.List;
+
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -9,6 +11,8 @@ import org.springframework.web.bind.annotation.RestController;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+import reactor.core.publisher.Mono;
+import webflux.example.boards.dto.DescriptionResponse;
 import webflux.example.members.application.service.MemberService;
 import webflux.example.members.domain.Member;
 import webflux.example.members.dto.MemberDTO;
@@ -41,8 +45,8 @@ public class MemberController {
     }
 
     @GetMapping("/member/description/{id}")
-    public void getMemberDescriptionsById(@PathVariable String id) {
-        memberService.findMemberDescriptions(id);
+    public Mono<List<DescriptionResponse>> getMemberDescriptionsById(@PathVariable String id) {
+        return memberService.findMemberDescriptions(id);
     }
 
 }

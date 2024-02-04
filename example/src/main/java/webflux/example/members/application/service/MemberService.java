@@ -1,5 +1,7 @@
 package webflux.example.members.application.service;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -37,10 +39,20 @@ public class MemberService {
     }
 
     @Transactional(readOnly = true)
-    public void findMemberDescriptions(String id) {
-        Mono<DescriptionResponse> mono = webClient.get()
+    public Mono<List<DescriptionResponse>> findMemberDescriptions(String id) {
+        return webClient.get()
             .uri("/descriptions/member/" + id)
             .retrieve()
-            .bodyToMono(DescriptionResponse.class);
+            .bodyToFlux(DescriptionResponse.class)
+            .collectList();
+
+//        mono.subscribe(
+//            dataList -> {
+//                for (DescriptionResponse data : dataList) {
+//                    log.warn(String.valueOf(data));
+//                }
+//            }
+//        );
+//
     }
 }
