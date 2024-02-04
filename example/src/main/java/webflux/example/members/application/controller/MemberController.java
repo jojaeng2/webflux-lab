@@ -20,7 +20,7 @@ import webflux.example.members.dto.MemberResponse;
 public class MemberController {
     private final MemberService memberService;
 
-    @PostMapping("/user")
+    @PostMapping("/member")
     public MemberResponse join(@RequestBody MemberDTO dto) {
         Member member = memberService.join(dto);
         return MemberResponse.builder()
@@ -30,7 +30,7 @@ public class MemberController {
             .build();
     }
 
-    @GetMapping("/user/{id}")
+    @GetMapping("/member/{id}")
     public MemberResponse getById(@PathVariable String id) {
         Member member = memberService.findById(id);
         return MemberResponse.builder()
@@ -39,4 +39,10 @@ public class MemberController {
             .age(member.getAge())
             .build();
     }
+
+    @GetMapping("/member/description/{id}")
+    public void getMemberDescriptionsById(@PathVariable String id) {
+        memberService.findMemberDescriptions(id);
+    }
+
 }
