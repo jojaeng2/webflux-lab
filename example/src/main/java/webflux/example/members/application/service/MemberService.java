@@ -10,11 +10,14 @@ import org.springframework.web.reactive.function.client.WebClient;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import webflux.example.boards.dto.DescriptionResponse;
 import webflux.example.config.WebClientConfig;
 import webflux.example.members.domain.Member;
 import webflux.example.members.dto.MemberDTO;
+import webflux.example.members.dto.MemberResponse;
+import webflux.example.members.dto.MemberResponseWithDescriptions;
 import webflux.example.members.repository.MemberRepository;
 
 @Slf4j
@@ -50,14 +53,30 @@ public class MemberService {
             .retrieve()
             .bodyToFlux(DescriptionResponse.class)
             .collectList();
+    }
 
-//        mono.subscribe(
-//            dataList -> {
-//                for (DescriptionResponse data : dataList) {
-//                    log.warn(String.valueOf(data));
-//                }
-//            }
-//        );
-//
+    @Transactional(readOnly = true)
+    public Mono<List<MemberResponseWithDescriptions>> findMembersDescription(List<String> ids) {
+        return Flux.fromIterable(ids)
+            .flatMap(id -> {
+                    Mono<List<DescriptionResponse>> response = webClient.get()
+                        .uri("/descriptions/member/" + id)
+                        .retrieve()
+                        .bodyToFlux(DescriptionResponse.class)
+                        .collectList();
+                    log.warn("id:{}", id);
+                    Mono<Member> member = Mono.fromCallable(() -> memberRepository.findById(id).orElse(null));
+                    return Mono.zip(response, member)
+                        .map(tuple -> MemberResponseWithDescriptions.builder()
+                            .memberResponse(MemberResponse.builder()
+                                .id(tuple.getT2().getId())
+                                .name(tuple.getT2().getName())
+                                .age(tuple.getT2().getAge())
+                                .build())
+                            .descriptions(tuple.getT1())
+                            .build());
+                }
+                )
+            .collectList();
     }
 }

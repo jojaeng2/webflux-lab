@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import lombok.RequiredArgsConstructor;
@@ -17,6 +18,7 @@ import webflux.example.members.application.service.MemberService;
 import webflux.example.members.domain.Member;
 import webflux.example.members.dto.MemberDTO;
 import webflux.example.members.dto.MemberResponse;
+import webflux.example.members.dto.MemberResponseWithDescriptions;
 
 @Slf4j
 @RestController
@@ -47,6 +49,11 @@ public class MemberController {
     @GetMapping("/member/description/{id}")
     public Mono<List<DescriptionResponse>> getMemberDescriptionsById(@PathVariable String id) {
         return memberService.findMemberDescriptions(id);
+    }
+
+    @GetMapping("/members/descriptions")
+    public Mono<List<MemberResponseWithDescriptions>> getMembersDescriptionsByIds(@RequestParam List<String> memberIds) {
+        return memberService.findMembersDescription(memberIds);
     }
 
     @GetMapping("/members")
