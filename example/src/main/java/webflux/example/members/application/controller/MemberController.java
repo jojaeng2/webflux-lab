@@ -49,4 +49,15 @@ public class MemberController {
         return memberService.findMemberDescriptions(id);
     }
 
+    @GetMapping("/members")
+    public List<MemberResponse> getAllMembers() {
+        List<Member> members = memberService.findAllMembers();
+        return members.stream()
+            .map(member -> MemberResponse.builder()
+                .id(member.getId())
+                .name(member.getName())
+                .age(member.getAge())
+                .build())
+            .toList();
+    }
 }

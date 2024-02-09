@@ -39,6 +39,11 @@ public class MemberService {
     }
 
     @Transactional(readOnly = true)
+    public List<Member> findAllMembers() {
+        return memberRepository.findAll();
+    }
+
+    @Transactional(readOnly = true)
     public Mono<List<DescriptionResponse>> findMemberDescriptions(String id) {
         return webClient.get()
             .uri("/descriptions/member/" + id)
