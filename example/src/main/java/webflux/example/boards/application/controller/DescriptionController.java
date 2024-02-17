@@ -9,12 +9,14 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 import webflux.example.boards.application.service.DescriptionService;
 import webflux.example.boards.domain.Description;
 import webflux.example.boards.dto.DescriptionDTO;
 import webflux.example.boards.dto.DescriptionResponse;
 
+@Slf4j
 @RestController
 @RequiredArgsConstructor
 public class DescriptionController {
@@ -44,6 +46,8 @@ public class DescriptionController {
 
     @GetMapping("/descriptions/member/{id}")
     public List<DescriptionResponse> getByMemberId(@PathVariable String id) {
+        log.warn("DescriptionController ### getByMemberId");
+
         return descriptionService.findByMemberId(id)
             .stream()
             .map(description -> DescriptionResponse.builder()

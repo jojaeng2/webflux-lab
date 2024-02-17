@@ -59,13 +59,19 @@ public class MemberService {
     public Mono<List<MemberResponseWithDescriptions>> findMembersDescription(List<String> ids) {
         return Flux.fromIterable(ids)
             .flatMap(id -> {
+                    log.warn("MemberService ### webClient ### Before");
+
                     Mono<List<DescriptionResponse>> response = webClient.get()
                         .uri("/descriptions/member/" + id)
                         .retrieve()
                         .bodyToFlux(DescriptionResponse.class)
                         .collectList();
-                    log.warn("id:{}", id);
+                    log.warn("MemberService ### webClient ### After");
+                    log.warn("MemberService ### repository Before");
+
                     Mono<Member> member = Mono.fromCallable(() -> memberRepository.findById(id).orElse(null));
+                    log.warn("MemberService ### repository After");
+
                     return Mono.zip(response, member)
                         .map(tuple -> MemberResponseWithDescriptions.builder()
                             .memberResponse(MemberResponse.builder()
