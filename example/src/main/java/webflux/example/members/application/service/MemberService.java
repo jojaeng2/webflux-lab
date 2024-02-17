@@ -1,5 +1,6 @@
 package webflux.example.members.application.service;
 
+import java.time.Duration;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -10,8 +11,11 @@ import org.springframework.web.reactive.function.client.WebClient;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+import io.netty.channel.ConnectTimeoutException;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import reactor.util.retry.RetryBackoffSpec;
+import reactor.util.retry.RetrySpec;
 import webflux.example.boards.dto.DescriptionResponse;
 import webflux.example.config.WebClientConfig;
 import webflux.example.members.domain.Member;
@@ -28,6 +32,9 @@ public class MemberService {
     @Qualifier(WebClientConfig.boardsWebClient)
     private final WebClient webClient;
     private final MemberRepository memberRepository;
+    private final RetryBackoffSpec retrySpec = RetrySpec
+        .fixedDelay(2, Duration.ofSeconds(1))
+        .doBeforeRetry(signal -> log.warn("attempted retry"));
 
     @Transactional
     public Member join(MemberDTO dto) {
@@ -57,6 +64,8 @@ public class MemberService {
 
     @Transactional(readOnly = true)
     public Mono<List<MemberResponseWithDescriptions>> findMembersDescription(List<String> ids) {
+
+
         return Flux.fromIterable(ids)
             .flatMap(id -> {
                     log.warn("MemberService ### webClient ### Before");
@@ -65,12 +74,10 @@ public class MemberService {
                         .uri("/descriptions/member/" + id)
                         .retrieve()
                         .bodyToFlux(DescriptionResponse.class)
-                        .collectList();
-                    log.warn("MemberService ### webClient ### After");
-                    log.warn("MemberService ### repository Before");
+                        .collectList()
+                        .retryWhen(retrySpec);
 
                     Mono<Member> member = Mono.fromCallable(() -> memberRepository.findById(id).orElse(null));
-                    log.warn("MemberService ### repository After");
 
                     return Mono.zip(response, member)
                         .map(tuple -> MemberResponseWithDescriptions.builder()
