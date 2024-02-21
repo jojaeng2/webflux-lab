@@ -46,8 +46,7 @@ public class DescriptionController {
 
     @GetMapping("/descriptions/member/{id}")
     public List<DescriptionResponse> getByMemberId(@PathVariable String id) {
-        log.warn("DescriptionController ### getByMemberId");
-
+        log.warn("DescriptionController#getByMemberId");
         return descriptionService.findByMemberId(id)
             .stream()
             .map(description -> DescriptionResponse.builder()

@@ -54,12 +54,26 @@ public class MemberService {
     }
 
     @Transactional(readOnly = true)
-    public Mono<List<DescriptionResponse>> findMemberDescriptions(String id) {
-        return webClient.get()
+    public Mono<List<DescriptionResponse>> findMemberDescriptionsNonBlocking(String id) {
+        Mono<List<DescriptionResponse>> response = webClient.get()
             .uri("/descriptions/member/" + id)
             .retrieve()
             .bodyToFlux(DescriptionResponse.class)
             .collectList();
+        log.warn("findMemberDescriptionsNonBlocking");
+        return response;
+    }
+
+    @Transactional(readOnly = true)
+    public List<DescriptionResponse> findMemberDescriptionBlocking(String id) {
+        List<DescriptionResponse> response = webClient.get()
+            .uri("/descriptions/member/" + id)
+            .retrieve()
+            .bodyToFlux(DescriptionResponse.class)
+            .collectList()
+            .block(Duration.ofSeconds(3));
+        log.warn("findMemberDescriptionBlocking");
+        return response;
     }
 
     @Transactional(readOnly = true)

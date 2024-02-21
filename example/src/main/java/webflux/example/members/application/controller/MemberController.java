@@ -46,9 +46,14 @@ public class MemberController {
             .build();
     }
 
-    @GetMapping("/member/description/{id}")
-    public Mono<List<DescriptionResponse>> getMemberDescriptionsById(@PathVariable String id) {
-        return memberService.findMemberDescriptions(id);
+    @GetMapping("/nonblock/member/description/{id}")
+    public Mono<List<DescriptionResponse>> getMemberDescriptionsByIdNonBlocking(@PathVariable String id) {
+        return memberService.findMemberDescriptionsNonBlocking(id);
+    }
+
+    @GetMapping("/block/member/description/{id}")
+    public List<DescriptionResponse> getMemberDescriptionsByBlocking(@PathVariable String id) {
+        return memberService.findMemberDescriptionBlocking(id);
     }
 
     @GetMapping("/members/descriptions")
