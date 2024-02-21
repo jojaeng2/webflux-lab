@@ -33,6 +33,7 @@ public class SinksExample01 {
             .handle((num, sinks) -> {
                 log.warn(num);
                 sinks.next(num);
+                sinks.next(num);
             })
             .subscribe(
                 (number) -> log.info("number: {}", number),
