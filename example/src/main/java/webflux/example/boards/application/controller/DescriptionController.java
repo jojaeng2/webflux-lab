@@ -2,6 +2,8 @@ package webflux.example.boards.application.controller;
 
 import java.util.List;
 
+import org.springframework.http.HttpStatusCode;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -11,6 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+import reactor.core.publisher.Mono;
 import webflux.example.boards.application.service.DescriptionService;
 import webflux.example.boards.domain.Description;
 import webflux.example.boards.dto.DescriptionDTO;
@@ -31,6 +34,12 @@ public class DescriptionController {
             .script(description.getScript())
             .register(description.getRegister())
             .build();
+    }
+
+    @GetMapping("/description")
+    public ResponseEntity<Description> getDescription() {
+        return new ResponseEntity<>(Description.create(DescriptionDTO.builder()
+            .title("T").script("script").memberId("memberId").build()) , null, HttpStatusCode.valueOf(500));
     }
 
     @GetMapping("/description/{id}")

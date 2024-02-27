@@ -12,15 +12,26 @@ import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+import webflux.example.exchange.MemoryLeakTest01;
+
 @Slf4j
 @Getter
-@NoArgsConstructor
 @RestController
+@RequiredArgsConstructor
 public class TestController {
+
+    private final MemoryLeakTest01 testtt;
 
     @GetMapping("/{id}")
     public ResponseEntity<String> getController(@PathVariable("id") String id) {
         log.warn("result = {}", id);
         return new ResponseEntity<>("ok", null, HttpStatusCode.valueOf(200));
     }
+
+//    @GetMapping("/memoryleak")
+//    public ResponseEntity<String> memoryLeak() throws InterruptedException {
+////        while(true){
+////            testtt.execute();
+////        }
+//    }
 }

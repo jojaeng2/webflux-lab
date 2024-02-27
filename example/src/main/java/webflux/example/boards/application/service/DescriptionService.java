@@ -8,8 +8,10 @@ import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+import reactor.core.publisher.Mono;
 import webflux.example.boards.domain.Description;
 import webflux.example.boards.dto.DescriptionDTO;
+import webflux.example.boards.dto.DescriptionResponse;
 import webflux.example.boards.repository.DescriptionRepository;
 
 @Slf4j
@@ -32,7 +34,12 @@ public class DescriptionService {
 
     @Transactional(readOnly = true)
     public List<Description> findByMemberId(String memberId) {
+        log.warn("### DescriptionService#findByMemberId");
         return descriptionRepository.findByMemberId(memberId);
+    }
+
+    public Mono<DescriptionResponse> findDescription() {
+        throw new RuntimeException();
     }
 
 }

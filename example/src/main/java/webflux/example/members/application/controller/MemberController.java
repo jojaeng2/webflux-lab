@@ -72,4 +72,12 @@ public class MemberController {
                 .build())
             .toList();
     }
+
+    @GetMapping("/member/descriptions/{id}")
+    public Mono<List<DescriptionResponse>> getMemberWithDescriptionsByMemberId(@PathVariable String id) {
+
+        Mono<List<DescriptionResponse>> response = memberService.findMemberDescription(id);
+        log.warn("### MemberController#getMembeWithDescriptionsByMemberId#after");
+        return response;
+    }
 }

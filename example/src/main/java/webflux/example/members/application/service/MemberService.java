@@ -108,4 +108,21 @@ public class MemberService {
                 )
             .collectList();
     }
+
+    @Transactional(readOnly = true)
+    public Mono<List<DescriptionResponse>> findMemberDescription(String id) {
+        Mono<List<DescriptionResponse>> response = webClient.get()
+            .uri("/descriptions/member/" + id)
+            .retrieve()
+            .bodyToFlux(DescriptionResponse.class)
+            .collectList()
+            .retryWhen(retrySpec);
+
+
+
+        log.warn("### MemberService#findMemberDescription#memberRepository#findById Before");
+        Member member = memberRepository.findById(id).orElse(null);
+        log.warn("### MemberService#findMemberDescription#memberRepository#findById After : {}", member.getId());
+        return response;
+    }
 }
