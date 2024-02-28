@@ -7,8 +7,7 @@ import reactor.core.publisher.Flux;
 @Slf4j
 public class MapExample {
     public static void main(String[] args) {
-        Flux<Integer> flux = Flux.just(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
+        Flux.just(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
             .map(num -> num * 2);
-
     }
 }
