@@ -1,5 +1,9 @@
 package webflux.example.forwebclient;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.Date;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
@@ -19,5 +23,10 @@ public class AController {
         log.warn("#AController ## getA");
         throw new Exception();
 //        return new ResponseEntity<>("a", HttpStatus.OK);
+    }
+
+    @GetMapping("/a/time")
+    public ResponseEntity<Date> getTime() {
+        return new ResponseEntity(LocalDateTime.now(), HttpStatus.OK);
     }
 }

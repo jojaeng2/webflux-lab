@@ -1,5 +1,7 @@
 package webflux.example.forwebclient;
 
+import java.util.Date;
+
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -7,6 +9,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 
 import lombok.extern.slf4j.Slf4j;
 
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @Slf4j
@@ -42,5 +45,27 @@ public class ClientController {
                 .retrieve()
                 .bodyToMono(String.class));
         return then;
+    }
+
+    @GetMapping("/zipWhen")
+    public Mono<String> zipWhen() {
+        Mono<Date> mono = WebClient.create().get()
+            .uri("http://localhost:8080/a/time").retrieve()
+            .bodyToMono(Date.class);
+
+        return mono.zipWhen(date -> WebClient.create().get()
+            .uri("http://localhost:8080/b/convert/" + date)
+            .retrieve()
+            .bodyToMono(String.class))
+            .flatMap(tuple -> Mono.just(tuple.getT2()));
+    }
+
+    @GetMapping("/doOn")
+    public void doOn() {
+        Flux.range(1, 10)
+            .doOnNext(System.out::println)
+            .doOnError(System.out::println)
+            .doOnComplete(System.out::println)
+            .subscribe();
     }
 }
