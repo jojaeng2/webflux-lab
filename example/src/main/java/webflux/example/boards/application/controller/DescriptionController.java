@@ -67,4 +67,21 @@ public class DescriptionController {
             )
             .toList();
     }
+
+    @GetMapping("/timeout/descriptions/member/{id}")
+    public List<DescriptionResponse> timeoutTest(@PathVariable String id) throws InterruptedException {
+        log.error("#timeout1: {}", id);
+        Thread.sleep(40000L);
+        log.error("#timeout2: {}", id);
+        return descriptionService.findByMemberId(id)
+            .stream()
+            .map(description -> DescriptionResponse.builder()
+                .id(description.getId())
+                .title(description.getTitle())
+                .script(description.getScript())
+                .register(description.getRegister())
+                .build()
+            )
+            .toList();
+    }
 }

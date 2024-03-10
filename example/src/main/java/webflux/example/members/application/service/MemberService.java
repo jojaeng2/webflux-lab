@@ -125,4 +125,17 @@ public class MemberService {
         log.warn("### MemberService#findMemberDescription#memberRepository#findById After : {}", member.getId());
         return response;
     }
+
+    @Transactional(readOnly = true)
+    public List<DescriptionResponse> findMemberDescriptionsTimeoutTest(String id) {
+        log.warn("#### NonBlocking Before");
+        List<DescriptionResponse> response = webClient.get()
+            .uri("/timeout/descriptions/member/" + id)
+            .retrieve()
+            .bodyToFlux(DescriptionResponse.class)
+            .collectList()
+            .block(Duration.ofSeconds(3L));
+        log.warn("#### NonBlocking After");
+        return response;
+    }
 }

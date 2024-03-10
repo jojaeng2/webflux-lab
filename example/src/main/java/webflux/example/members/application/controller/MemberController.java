@@ -56,6 +56,11 @@ public class MemberController {
         return memberService.findMemberDescriptionBlocking(id);
     }
 
+    @GetMapping("/timeout/member/description/{id}")
+    public List<DescriptionResponse> getMemberDescriptionsTimeoutTest(@PathVariable String id) {
+        return memberService.findMemberDescriptionsTimeoutTest(id);
+    }
+
     @GetMapping("/members/descriptions")
     public Mono<List<MemberResponseWithDescriptions>> getMembersDescriptionsByIds(@RequestParam List<String> memberIds) {
         return memberService.findMembersDescription(memberIds);
