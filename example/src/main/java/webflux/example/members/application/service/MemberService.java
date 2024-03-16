@@ -1,9 +1,13 @@
 package webflux.example.members.application.service;
 
 import java.time.Duration;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
 
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -11,7 +15,6 @@ import org.springframework.web.reactive.function.client.WebClient;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-import io.netty.channel.ConnectTimeoutException;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.util.retry.RetryBackoffSpec;
@@ -58,9 +61,15 @@ public class MemberService {
         log.warn("#### NonBlocking Before");
         Mono<List<DescriptionResponse>> response = webClient.get()
             .uri("/descriptions/member/" + id)
-            .retrieve()
-            .bodyToFlux(DescriptionResponse.class)
-            .collectList();
+            .exchangeToMono(clientResponse -> clientResponse.bodyToFlux(DescriptionResponse.class)
+                .map(descriptionResponse -> {
+                    if (clientResponse.statusCode() != HttpStatus.OK) {
+                        return new DescriptionResponse(null, null, null, null);
+                    }
+                    return descriptionResponse;
+                })
+                .collectList()
+            );
         log.warn("#### NonBlocking After");
         return response;
     }
@@ -127,15 +136,18 @@ public class MemberService {
     }
 
     @Transactional(readOnly = true)
-    public List<DescriptionResponse> findMemberDescriptionsTimeoutTest(String id) {
+    public List<DescriptionResponse> findMemberDescriptionsTimeoutTest(String id) throws InterruptedException {
         log.warn("#### NonBlocking Before");
+
         List<DescriptionResponse> response = webClient.get()
             .uri("/timeout/descriptions/member/" + id)
             .retrieve()
             .bodyToFlux(DescriptionResponse.class)
             .collectList()
-            .block(Duration.ofSeconds(3L));
+            .block(Duration.ofSeconds(2));
+
         log.warn("#### NonBlocking After");
+        Thread.sleep(10000L);
         return response;
     }
 }

@@ -57,7 +57,7 @@ public class MemberController {
     }
 
     @GetMapping("/timeout/member/description/{id}")
-    public List<DescriptionResponse> getMemberDescriptionsTimeoutTest(@PathVariable String id) {
+    public List<DescriptionResponse> getMemberDescriptionsTimeoutTest(@PathVariable String id) throws InterruptedException {
         return memberService.findMemberDescriptionsTimeoutTest(id);
     }
 
