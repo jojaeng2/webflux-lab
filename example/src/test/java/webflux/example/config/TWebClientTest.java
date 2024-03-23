@@ -16,12 +16,12 @@ public class TWebClientTest {
 
     @Test
     void test() {
-        Mono<String> mono = client.get()
-            .uri("/persons/{id}", "11")
-            .accept(MediaType.APPLICATION_JSON)
-            .retrieve()
-            .bodyToMono(String.class)
-                .doOnSuccess()
-        System.out.println("mono.do = " + mono.do);
+//        Mono<String> mono = client.get()
+//            .uri("/persons/{id}", "11")
+//            .accept(MediaType.APPLICATION_JSON)
+//            .retrieve()
+//            .bodyToMono(String.class)
+//                .doOnSuccess();
+//        System.out.println("mono.do = " + mono.do);
     }
 }

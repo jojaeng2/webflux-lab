@@ -17,6 +17,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Schedulers;
 import reactor.util.retry.RetryBackoffSpec;
 import reactor.util.retry.RetrySpec;
 import webflux.example.boards.dto.DescriptionResponse;
@@ -87,6 +88,15 @@ public class MemberService {
         return response;
     }
 
+    public List<DescriptionResponse> v1TimeoutTest() {
+        return webClient.get()
+            .uri("/timeout/descriptions/member/8ae03ee1-57e2-48c7-b8a3-af3ca7d824d8")
+            .retrieve()
+            .bodyToFlux(DescriptionResponse.class)
+            .collectList()
+            .block();
+    }
+
     @Transactional(readOnly = true)
     public Mono<List<MemberResponseWithDescriptions>> findMembersDescription(List<String> ids) {
 
@@ -136,18 +146,118 @@ public class MemberService {
     }
 
     @Transactional(readOnly = true)
-    public List<DescriptionResponse> findMemberDescriptionsTimeoutTest(String id) throws InterruptedException {
+    public Mono<List<DescriptionResponse>> findMemberDescriptionsTimeoutTest(String id) throws InterruptedException {
         log.warn("#### NonBlocking Before");
 
-        List<DescriptionResponse> response = webClient.get()
+        Mono<List<DescriptionResponse>> mono = webClient.get()
             .uri("/timeout/descriptions/member/" + id)
             .retrieve()
             .bodyToFlux(DescriptionResponse.class)
-            .collectList()
-            .block(Duration.ofSeconds(2));
+            .collectList();
 
         log.warn("#### NonBlocking After");
-        Thread.sleep(10000L);
+        return mono;
+    }
+
+    public Mono<String> timeoutTest() {
+        return Mono.just("value")
+            .subscribeOn(Schedulers.parallel())
+            .map(data -> {
+                try {
+                    log.error("new thread start");
+                    Thread.sleep(40000L);
+                    log.error("new thread end");
+                } catch (InterruptedException e) {
+                    log.error("interruptedException: {}", e.getMessage());
+                    throw new RuntimeException(e);
+                }
+                return data;
+            });
+    }
+
+    public Mono<String> blockTest() {
+        return Mono.just("value")
+            .subscribeOn(Schedulers.parallel())
+            .map(data -> {
+                try {
+                    log.warn("# Blocking Test ## 2");
+                    Thread.sleep(10000L);
+                    log.warn("# Blocking Test ## 3");
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
+                return data;
+            });
+    }
+
+    public List<Integer> subscribeTest() throws InterruptedException {
+        log.warn("subscribeTest service Before");
+        ArrayList<Integer> list = new ArrayList<>();
+        Flux.just(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
+            .subscribe(data -> {
+                log.warn("subscribe data :{}", data);
+                list.add(data);
+            });
+        log.warn("subscribeTest service After");
+        System.out.println("list.size() = " + list.size());
+        return list;
+    }
+
+    public Mono<List<DescriptionResponse>> v2FindMemberDescription(String id) throws InterruptedException {
+        log.warn("# v2FindMemberDescription ## Before");
+        Thread.sleep(1000L);
+        Mono<List<DescriptionResponse>> response = webClient.get()
+            .uri("/descriptions/member/" + id)
+            .retrieve()
+            .bodyToFlux(DescriptionResponse.class)
+            .collectList();
+
+        log.warn("# v2FindMemberDescription ## After");
         return response;
+    }
+
+    public List<DescriptionResponse> v3FindMemberDescription(String id) throws InterruptedException {
+        log.warn("# v3FindMemberDescription ## Before");
+        List<DescriptionResponse> response = webClient.get()
+            .uri("/descriptions/member/" + id)
+            .retrieve()
+            .bodyToFlux(DescriptionResponse.class)
+            .map(data -> {
+                try {
+                    Thread.sleep(100L);
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
+                return data;
+            })
+            .collectList()
+                .block();
+
+        log.warn("# v3FindMemberDescription ## After");
+        return response;
+    }
+
+    public List<String> v1SubscribeTest() {
+        List<String> result = new ArrayList<>();
+
+        webClient.get()
+            .uri("http://localhost:8080/test-for-member")
+            .retrieve()
+            .bodyToFlux(String.class)
+                .subscribe(data -> {
+                    log.warn("subscribe :{}", data);
+                    result.add(data);
+                });
+//
+//        flux
+//            .collectList();
+////            .subscribe(data -> {
+////            log.warn("data : {}", data);
+////            result.add(data);
+////
+////        });
+        log.warn("v1SubscribeTest Service Layer Result Size: {}", result.size());
+
+        return result;
     }
 }
