@@ -6,7 +6,9 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.web.reactive.function.client.WebClient;
 
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import reactor.test.StepVerifier;
 
 @SpringBootTest
 public class TWebClientTest {
@@ -23,5 +25,9 @@ public class TWebClientTest {
 //            .bodyToMono(String.class)
 //                .doOnSuccess();
 //        System.out.println("mono.do = " + mono.do);
+        StepVerifier.create(Flux.just("1"))
+            .expectNext("foo", "bar")
+            .verifyError(RuntimeException.class);
+
     }
 }

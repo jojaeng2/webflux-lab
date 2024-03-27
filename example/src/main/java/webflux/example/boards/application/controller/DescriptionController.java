@@ -84,4 +84,10 @@ public class DescriptionController {
             )
             .toList();
     }
+
+    @GetMapping("/blocking")
+    public String blocking() throws InterruptedException {
+        Thread.sleep(5000L);
+        return "blocking";
+    }
 }

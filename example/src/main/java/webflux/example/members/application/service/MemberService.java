@@ -43,6 +43,9 @@ public class MemberService {
     @Transactional
     public Member join(MemberDTO dto) {
         Member member = Member.create(dto);
+        Flux.just("a")
+            .filter(data -> data.equals("foo") || data.equals("bar"))
+                .subscribe(data -> new Exception());
         return memberRepository.save(member);
     }
 
@@ -100,7 +103,6 @@ public class MemberService {
     @Transactional(readOnly = true)
     public Mono<List<MemberResponseWithDescriptions>> findMembersDescription(List<String> ids) {
 
-
         return Flux.fromIterable(ids)
             .flatMap(id -> {
                     log.warn("MemberService ### webClient ### Before");
@@ -124,7 +126,7 @@ public class MemberService {
                             .descriptions(tuple.getT1())
                             .build());
                 }
-                )
+            )
             .collectList();
     }
 
@@ -136,8 +138,6 @@ public class MemberService {
             .bodyToFlux(DescriptionResponse.class)
             .collectList()
             .retryWhen(retrySpec);
-
-
 
         log.warn("### MemberService#findMemberDescription#memberRepository#findById Before");
         Member member = memberRepository.findById(id).orElse(null);
@@ -231,7 +231,7 @@ public class MemberService {
                 return data;
             })
             .collectList()
-                .block();
+            .block();
 
         log.warn("# v3FindMemberDescription ## After");
         return response;
@@ -244,20 +244,29 @@ public class MemberService {
             .uri("http://localhost:8080/test-for-member")
             .retrieve()
             .bodyToFlux(String.class)
-                .subscribe(data -> {
-                    log.warn("subscribe :{}", data);
-                    result.add(data);
-                });
-//
-//        flux
-//            .collectList();
-////            .subscribe(data -> {
-////            log.warn("data : {}", data);
-////            result.add(data);
-////
-////        });
+            .subscribe(data -> {
+                log.warn("subscribe :{}", data);
+                result.add(data);
+            });
+        //
+        //        flux
+        //            .collectList();
+        ////            .subscribe(data -> {
+        ////            log.warn("data : {}", data);
+        ////            result.add(data);
+        ////
+        ////        });
         log.warn("v1SubscribeTest Service Layer Result Size: {}", result.size());
 
         return result;
+    }
+
+    public String blockWebFlux() {
+        webClient.get()
+            .uri("/blocking")
+            .retrieve()
+            .bodyToMono(String.class)
+            .subscribe(log::warn);
+        return "ok";
     }
 }

@@ -160,4 +160,14 @@ public class MemberController {
         Thread.sleep(40000L);
         log.warn("for-read-timeout-after");
     }
+
+    @GetMapping("/sample/suffix")
+    public String getSuffix() {
+        return "suffix-";
+    }
+
+    @GetMapping("/block/webflux")
+    public String blockWebFlux() {
+        return memberService.blockWebFlux();
+    }
 }
